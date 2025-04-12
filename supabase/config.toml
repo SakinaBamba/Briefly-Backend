@@ -1,0 +1,4 @@
+project_id = "rpcypbgyhlidifpqckgl"
+
+[functions]
+  ignore = ["node_modules/", ".git/", ".vercel/", "dist/", "build/"]
