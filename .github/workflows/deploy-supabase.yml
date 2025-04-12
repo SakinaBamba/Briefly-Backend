@@ -16,9 +16,9 @@ jobs:
 
       - name: ⚙️ Download & Install Supabase CLI
         run: |
-          curl -L https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64 -o supabase
-          chmod +x supabase
-          sudo mv supabase /usr/local/bin/supabase
+          curl -L https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64 -o supabase-cli
+          chmod +x supabase-cli
+          sudo mv supabase-cli /usr/local/bin/supabase
 
       - name: 🚀 Deploy summarizeMeeting function
         env:
