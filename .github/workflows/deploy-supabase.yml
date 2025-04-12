@@ -14,9 +14,10 @@ jobs:
       - name: 📥 Checkout repo
         uses: actions/checkout@v3
 
-      - name: ⚙️ Install Supabase CLI (stable + export PATH)
+      - name: ⚙️ Download & Install Supabase CLI via wget
         run: |
-          curl -sL https://github.com/supabase/cli/releases/download/v1.152.1/supabase_linux_amd64 -o ~/.local/bin/supabase
+          mkdir -p ~/.local/bin
+          wget https://github.com/supabase/cli/releases/download/v1.152.1/supabase_linux_amd64 -O ~/.local/bin/supabase
           chmod +x ~/.local/bin/supabase
         env:
           PATH: ~/.local/bin:$PATH
