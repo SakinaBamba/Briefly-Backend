@@ -14,19 +14,15 @@ jobs:
       - name: 📥 Checkout repo
         uses: actions/checkout@v3
 
-      - name: ⚙️ Download & Install Supabase CLI via wget
+      - name: ⚙️ Download Supabase CLI
         run: |
           mkdir -p ~/.local/bin
           wget https://github.com/supabase/cli/releases/download/v1.152.1/supabase_linux_amd64 -O ~/.local/bin/supabase
           chmod +x ~/.local/bin/supabase
-        env:
-          PATH: ~/.local/bin:$PATH
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: 🚀 Deploy summarizeMeeting function
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          PATH: ~/.local/bin:$PATH
         run: |
           supabase functions deploy summarizeMeeting --project-ref rpcypbgyhlidifpqckgl
-
-
