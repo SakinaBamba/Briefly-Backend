@@ -18,7 +18,8 @@ jobs:
       - name: Install Supabase CLI
         run: |
           mkdir -p ~/.local/bin
-          curl -L https://github.com/supabase/cli/releases/download/v1.152.1/supabase_linux_amd64 -o ~/.local/bin/supabase
+          curl -L https://github.com/supabase/cli/releases/download/v1.152.1/supabase_linux_amd64.tar.gz -o supabase.tar.gz
+          tar -xzf supabase.tar.gz -C ~/.local/bin
           chmod +x ~/.local/bin/supabase
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
@@ -26,4 +27,5 @@ jobs:
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
         run: supabase functions deploy summarizeMeeting --project-ref rpcypbgyhlidifpqckgl
+
 
