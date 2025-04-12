@@ -14,9 +14,9 @@ jobs:
       - name: 📥 Checkout repo
         uses: actions/checkout@v3
 
-      - name: ⚙️ Download & Install Supabase CLI
+      - name: ⚙️ Install Supabase CLI (stable release)
         run: |
-          curl -L https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64 -o supabase-cli
+          curl -L https://github.com/supabase/cli/releases/download/v1.152.1/supabase_linux_amd64 -o supabase-cli
           chmod +x supabase-cli
           sudo mv supabase-cli /usr/local/bin/supabase
 
