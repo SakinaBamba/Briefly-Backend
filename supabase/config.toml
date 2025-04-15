@@ -1,4 +1,6 @@
-project_id = "rpcypbgyhlidifpqckgl"
+[project]
+ref = "rpcypbgyhlidifpqckgl"
+name = "Briefly-Backend"
 
 [functions]
-  ignore = ["node_modules/", ".git/", ".vercel/", "dist/", "build/"]
+ignore = ["node_modules/", ".git/", ".github/"]
