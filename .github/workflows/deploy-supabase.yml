@@ -24,7 +24,7 @@ jobs:
           chmod +x ~/.local/bin/supabase
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
-      - name: Debug current directory
-        run: pwd && ls -la
-
-
+      - name: Deploy summarizeMeeting function
+        run: supabase functions deploy summarizeMeeting --project-ref=rpcypbgyhlidifpqckgl --workdir=./supabase
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
