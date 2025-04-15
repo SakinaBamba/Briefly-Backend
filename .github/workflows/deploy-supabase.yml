@@ -24,8 +24,6 @@ jobs:
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Deploy summarizeMeeting function
+        run: supabase functions deploy summarizeMeeting --project-ref=rpcypbgyhlidifpqckgl
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-        run: supabase functions deploy summarizeMeeting --project-ref rpcypbgyhlidifpqckgl
-
-
