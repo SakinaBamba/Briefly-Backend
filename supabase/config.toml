@@ -3,4 +3,5 @@ ref = "rpcypbgyhlidifpqckgl"
 name = "Briefly-Backend"
 
 [functions]
-ignore = ["node_modules/", ".git/", ".github/"]
+ignore = "node_modules/, .git/, .github/"
+
