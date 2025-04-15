@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'supabase/functions/summarizeMeeting/**'
+      - 'supabase/config.toml'
 
 jobs:
   deploy:
@@ -22,6 +23,9 @@ jobs:
           tar -xzf supabase.tar.gz -C ~/.local/bin
           chmod +x ~/.local/bin/supabase
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Debug current directory
+        run: pwd && ls -la
 
       - name: Deploy summarizeMeeting function
         run: supabase functions deploy summarizeMeeting --project-ref=rpcypbgyhlidifpqckgl --workdir=./supabase
