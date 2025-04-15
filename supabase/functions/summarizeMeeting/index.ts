@@ -10,12 +10,8 @@ serve(async (req) => {
   try {
     const { transcript, user_id } = await req.json()
 
-    console.log("Received transcript:", transcript)
-    console.log("Received user_id:", user_id)
-
-    // Call OpenAI or generate dummy response for now
     const summary = `Auto-generated summary for: ${transcript}`
-    const proposal_items = ["Item 1", "Item 2"] // dummy
+    const proposal_items = ["Item 1", "Item 2"]
 
     const { error } = await supabase.from("meetings").insert({
       user_id,
@@ -26,7 +22,6 @@ serve(async (req) => {
     })
 
     if (error) {
-      console.error("Supabase insert error:", error)
       return new Response(JSON.stringify({ error: "Insert failed", details: error }), {
         headers: { "Content-Type": "application/json" },
         status: 500
@@ -38,7 +33,6 @@ serve(async (req) => {
       status: 200
     })
   } catch (e) {
-    console.error("Parsing or logic error:", e)
     return new Response(JSON.stringify({ error: "Failed to parse or insert", details: e }), {
       headers: { "Content-Type": "application/json" },
       status: 400
