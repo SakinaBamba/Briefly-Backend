@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
+
 serve(async (req) => {
   const { transcript, user_id } = await req.json();
 
