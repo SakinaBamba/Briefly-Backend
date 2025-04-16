@@ -7,16 +7,45 @@ serve(async (req) => {
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
   )
 
+  const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")
+
   try {
     const { transcript, user_id } = await req.json()
 
-    const summary = `Auto-generated summary for: ${transcript}`
-    const proposal_items = ["Item 1", "Item 2"]
+    const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4",
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful assistant that summarizes sales meetings and extracts proposal items."
+          },
+          {
+            role: "user",
+            content: `Here's the meeting transcript:\n\n${transcript}\n\nPlease provide a short summary of the meeting and a bullet point list of any proposal items discussed.`
+          }
+        ],
+        temperature: 0.3
+      })
+    })
+
+    const openaiData = await openaiRes.json()
+
+    const gptMessage = openaiData.choices?.[0]?.message?.content || "Summary unavailable."
+
+    // Split summary and proposal items
+    const [summary, ...rest] = gptMessage.split("Proposal items:")
+    const proposal_items = rest?.[0]?.split("\n").filter(line => line.trim().startsWith("-")) || []
 
     const { error } = await supabase.from("meetings").insert({
       user_id,
       transcript,
-      summary,
+      summary: summary.trim(),
       proposal_items,
       created_at: new Date().toISOString()
     })
@@ -28,10 +57,11 @@ serve(async (req) => {
       })
     }
 
-    return new Response(JSON.stringify({ summary }), {
+    return new Response(JSON.stringify({ summary: summary.trim(), proposal_items }), {
       headers: { "Content-Type": "application/json" },
       status: 200
     })
+
   } catch (e) {
     return new Response(JSON.stringify({ error: "Failed to parse or insert", details: e }), {
       headers: { "Content-Type": "application/json" },
@@ -39,3 +69,4 @@ serve(async (req) => {
     })
   }
 })
+
