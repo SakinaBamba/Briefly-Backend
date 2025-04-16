@@ -1,88 +1,86 @@
-import { serve } from "https://deno.land/std/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3"
-
+import { serve } from "https://deno.land/std/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 serve(async (req) => {
-  const supabase = createClient(
+  const supabaseClient = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-  )
-
-  const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY")
+  );
 
   try {
-    const { transcript, user_id } = await req.json()
+    const { transcript, user_id } = await req.json();
 
-    const openaiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+    const openAIRes = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENAI_API_KEY}`
+        Authorization: `Bearer ${Deno.env.get("OPENAI_API_KEY")}`
       },
       body: JSON.stringify({
-        model: "gpt-3.5-turbo",
+        model: "gpt-4-1106-preview",
         messages: [
           {
             role: "system",
-            content: "You are a helpful assistant that summarizes sales meetings and extracts proposal items."
+            content: "You are a helpful assistant that summarizes meetings and extracts proposal items."
           },
           {
             role: "user",
             content: `Here's the meeting transcript:\n\n${transcript}\n\nPlease provide a short summary of the meeting and a bullet point list of any proposal items discussed.`
           }
         ],
-        temperature: 0.3
+        temperature: 0.3,
+        max_tokens: 500
       })
-    })
+    });
 
-    const openaiData = await openaiRes.json()
-    console.log("OpenAI raw response:", JSON.stringify(openaiData, null, 2)) // 🧠 DEBUG LOG
+    const data = await openAIRes.json();
+    console.log("OpenAI raw response:", data);
 
-    if (!openaiData.choices || !openaiData.choices[0]?.message?.content) {
+    if (!data.choices || !data.choices[0]?.message?.content) {
       return new Response(JSON.stringify({
-        error: "OpenAI response error",
-        details: openaiData
-      }), {
-        headers: { "Content-Type": "application/json" },
-        status: 500
-      })
+        error: "Invalid response from OpenAI",
+        details: data
+      }), { status: 500 });
     }
 
-    const gptMessage = openaiData.choices[0].message.content
-
-    // 🧠 Parse the message into summary and proposal items
-    const [summaryPart, itemsPart] = gptMessage.split("Proposal items:")
-    const summary = summaryPart?.trim() || "Summary unavailable."
+    const gptMessage = data.choices[0].message.content;
+    const [summaryPart, itemsPart] = gptMessage.split("Proposal items:");
+    const summary = summaryPart?.trim() || "Summary unavailable.";
     const proposal_items = itemsPart
       ? itemsPart.split("\n").filter(line => line.trim().startsWith("-"))
-      : []
+      : [];
 
-    const { error } = await supabase.from("meetings").insert({
-      user_id,
-      transcript,
-      summary,
-      proposal_items,
-      created_at: new Date().toISOString()
-    })
+    // Insert into Supabase
+    const { error: insertError } = await supabaseClient
+      .from("meetings")
+      .insert([
+        {
+          user_id,
+          transcript,
+          summary,
+          proposal_items,
+          title: "Untitled Meeting" // You can improve this later using Graph API titles
+        }
+      ]);
 
-    if (error) {
-      return new Response(JSON.stringify({ error: "Insert failed", details: error }), {
-        headers: { "Content-Type": "application/json" },
-        status: 500
-      })
+    if (insertError) {
+      console.error("Insert error:", insertError);
+      return new Response(JSON.stringify({
+        error: "Failed to insert into Supabase",
+        details: insertError
+      }), { status: 500 });
     }
 
     return new Response(JSON.stringify({ summary, proposal_items }), {
       headers: { "Content-Type": "application/json" },
       status: 200
-    })
+    });
 
-  } catch (e) {
-    console.error("Function error:", e)
-    return new Response(JSON.stringify({ error: "Failed to parse or insert", details: e }), {
-      headers: { "Content-Type": "application/json" },
-      status: 400
-    })
+  } catch (err) {
+    console.error("Function error:", err);
+    return new Response(JSON.stringify({
+      error: "Failed to parse or insert",
+      details: err.message
+    }), { status: 500 });
   }
-})
-
+});
