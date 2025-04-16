@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3"
 
-
 serve(async (req) => {
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL")!,
@@ -36,17 +35,31 @@ serve(async (req) => {
     })
 
     const openaiData = await openaiRes.json()
+    console.log("OpenAI raw response:", JSON.stringify(openaiData, null, 2)) // 🧠 DEBUG LOG
 
-    const gptMessage = openaiData.choices?.[0]?.message?.content || "Summary unavailable."
+    if (!openaiData.choices || !openaiData.choices[0]?.message?.content) {
+      return new Response(JSON.stringify({
+        error: "OpenAI response error",
+        details: openaiData
+      }), {
+        headers: { "Content-Type": "application/json" },
+        status: 500
+      })
+    }
 
-    // Split summary and proposal items
-    const [summary, ...rest] = gptMessage.split("Proposal items:")
-    const proposal_items = rest?.[0]?.split("\n").filter(line => line.trim().startsWith("-")) || []
+    const gptMessage = openaiData.choices[0].message.content
+
+    // 🧠 Parse the message into summary and proposal items
+    const [summaryPart, itemsPart] = gptMessage.split("Proposal items:")
+    const summary = summaryPart?.trim() || "Summary unavailable."
+    const proposal_items = itemsPart
+      ? itemsPart.split("\n").filter(line => line.trim().startsWith("-"))
+      : []
 
     const { error } = await supabase.from("meetings").insert({
       user_id,
       transcript,
-      summary: summary.trim(),
+      summary,
       proposal_items,
       created_at: new Date().toISOString()
     })
@@ -58,12 +71,13 @@ serve(async (req) => {
       })
     }
 
-    return new Response(JSON.stringify({ summary: summary.trim(), proposal_items }), {
+    return new Response(JSON.stringify({ summary, proposal_items }), {
       headers: { "Content-Type": "application/json" },
       status: 200
     })
 
   } catch (e) {
+    console.error("Function error:", e)
     return new Response(JSON.stringify({ error: "Failed to parse or insert", details: e }), {
       headers: { "Content-Type": "application/json" },
       status: 400
