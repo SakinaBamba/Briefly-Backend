@@ -1,19 +1,15 @@
-# .github/workflows/renew-graph-subscription.yml
 name: Renew Graph Subscription
 
+# Run every 45 minutes
 on:
-  # manual trigger
-  workflow_dispatch:
-  # scheduled trigger every 12 hours
   schedule:
-    - cron: '0 */12 * * *'
+    - cron: '*/45 * * * *'
 
 jobs:
   renew:
     runs-on: ubuntu-latest
     steps:
-      - name: Renew MSFT Graph Subscription
+      - name: Renew subscription
         run: |
-          curl --request POST \
-               --url https://briefly-theta.vercel.app/api/graph/subscribe \
-               --header "Content-Type: application/json"
+          curl -X POST https://briefly-theta.vercel.app/api/graph/subscribe \
+               -H "Content-Type: application/json"
