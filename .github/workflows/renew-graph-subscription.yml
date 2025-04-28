@@ -2,14 +2,15 @@
 name: Renew Graph Subscription
 
 on:
+  # manual trigger
+  workflow_dispatch:
+  # scheduled trigger every 12 hours
   schedule:
-    # runs every 12 hours to stay well under the ~3-day max expiration
     - cron: '0 */12 * * *'
 
 jobs:
   renew:
     runs-on: ubuntu-latest
-
     steps:
       - name: Renew MSFT Graph Subscription
         run: |
