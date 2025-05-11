@@ -3,7 +3,7 @@ name: Renew Graph Subscription
 # Run every 45 minutes
 on:
   schedule:
-    - cron: '*/45 * * * *'
+    - cron: '0 0 * * *'   # every day at midnight UTC
 
 jobs:
   renew:
