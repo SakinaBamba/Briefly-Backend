@@ -4,6 +4,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import { Client } from '@microsoft/microsoft-graph-client';
 import 'isomorphic-fetch';
 
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') return res.status(405).end('Method Not Allowed');
 
