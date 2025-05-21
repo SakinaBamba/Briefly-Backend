@@ -13,15 +13,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Supabase CLI
+      - name: Install Supabase CLI via NPM
         run: |
-          mkdir -p ~/.local/bin
-          # Download the raw binary directly (no tarball)
-          curl -L \
-            "https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64?raw=true" \
-            -o ~/.local/bin/supabase
-          chmod +x ~/.local/bin/supabase
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          npm install -g supabase@latest
 
       - name: Deploy summarizeMeeting function
         working-directory: ./supabase
@@ -34,5 +28,6 @@ jobs:
         run: supabase functions deploy uploadTranscript --project-ref=rpcypbgyhlidifpqckgl
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
 
 
