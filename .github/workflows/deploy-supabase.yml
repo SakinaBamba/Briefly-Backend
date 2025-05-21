@@ -1,3 +1,6 @@
+Here’s the complete `.github/workflows/deploy-supabase-edge-functions.yml` workflow with the updated `name` and both functions being deployed:
+
+```yaml
 name: Deploy Supabase Edge Functions
 
 on:
@@ -28,3 +31,4 @@ jobs:
       - name: Deploy uploadTranscript
         run: |
           supabase functions deploy uploadTranscript --project-ref $PROJECT_REF
+```
