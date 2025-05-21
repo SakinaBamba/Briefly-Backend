@@ -4,10 +4,10 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'supabase/functions/summarizeMeeting/**'
-      - 'supabase/functions/uploadTranscript/**'
-      - 'supabase/config.toml'
+    # You can re-add paths filters once it's working:
+    # paths:
+    #   - 'supabase/functions/**'
+    #   - 'supabase/config.toml'
 
 jobs:
   deploy:
@@ -20,20 +20,28 @@ jobs:
       - name: Install Supabase CLI
         run: |
           mkdir -p ~/.local/bin
-          curl -L https://github.com/supabase/cli/releases/latest/download/supabase-linux-amd64 \
-            -o ~/.local/bin/supabase
+          # Download the Linux amd64 tarball
+          curl -L \
+            https://github.com/supabase/cli/releases/latest/download/supabase_1.152.1_linux_amd64.tar.gz \
+            -o supabase.tar.gz
+          # Extract the 'supabase' binary into ~/.local/bin
+          tar -xzf supabase.tar.gz -C ~/.local/bin supabase
           chmod +x ~/.local/bin/supabase
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Deploy summarizeMeeting function
         working-directory: ./supabase
-        run: supabase functions deploy summarizeMeeting --project-ref=rpcypbgyhlidifpqckgl
+        run: |
+          supabase functions deploy summarizeMeeting \
+            --project-ref rpcypbgyhlidifpqckgl
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Deploy uploadTranscript function
         working-directory: ./supabase
-        run: supabase functions deploy uploadTranscript --project-ref=rpcypbgyhlidifpqckgl
+        run: |
+          supabase functions deploy uploadTranscript \
+            --project-ref rpcypbgyhlidifpqckgl
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
