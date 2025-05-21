@@ -13,19 +13,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Supabase CLI via NPM
-        run: |
-          npm install -g supabase@latest
-
-      - name: Deploy summarizeMeeting function
-        working-directory: ./supabase
-        run: supabase functions deploy summarizeMeeting --project-ref=rpcypbgyhlidifpqckgl
+      - name: Deploy summarizeMeeting
+        uses: supabase/cli-action@v1
+        with:
+          args: functions deploy summarizeMeeting --project-ref rpcypbgyhlidifpqckgl
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
-      - name: Deploy uploadTranscript function
-        working-directory: ./supabase
-        run: supabase functions deploy uploadTranscript --project-ref=rpcypbgyhlidifpqckgl
+      - name: Deploy uploadTranscript
+        uses: supabase/cli-action@v1
+        with:
+          args: functions deploy uploadTranscript --project-ref rpcypbgyhlidifpqckgl
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
