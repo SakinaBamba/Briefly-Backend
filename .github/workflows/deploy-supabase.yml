@@ -16,26 +16,22 @@ jobs:
       - name: Install Supabase CLI
         run: |
           mkdir -p ~/.local/bin
-          # Download the correct tarball for v1.152.1
+          # Download the raw binary directly (no tarball)
           curl -L \
-            https://github.com/supabase/cli/releases/download/v1.152.1/supabase_1.152.1_linux_amd64.tar.gz \
-            -o supabase.tar.gz
-          # Extract only the 'supabase' executable into ~/.local/bin
-          tar -xzf supabase.tar.gz -C ~/.local/bin supabase
+            "https://github.com/supabase/cli/releases/latest/download/supabase_linux_amd64?raw=true" \
+            -o ~/.local/bin/supabase
           chmod +x ~/.local/bin/supabase
           echo "$HOME/.local/bin" >> $GITHUB_PATH
 
       - name: Deploy summarizeMeeting function
         working-directory: ./supabase
-        run: |
-          supabase functions deploy summarizeMeeting --project-ref=rpcypbgyhlidifpqckgl
+        run: supabase functions deploy summarizeMeeting --project-ref=rpcypbgyhlidifpqckgl
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
       - name: Deploy uploadTranscript function
         working-directory: ./supabase
-        run: |
-          supabase functions deploy uploadTranscript --project-ref=rpcypbgyhlidifpqckgl
+        run: supabase functions deploy uploadTranscript --project-ref=rpcypbgyhlidifpqckgl
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
 
