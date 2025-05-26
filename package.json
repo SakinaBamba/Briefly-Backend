@@ -1,0 +1,16 @@
+{
+  "name": "briefly-backend",
+  "version": "1.0.0",
+  "description": "Backend scripts for Briefly (e.g. fetch transcript with Puppeteer)",
+  "main": "scripts/fetchTranscript.js",
+  "type": "module",
+  "scripts": {
+    "fetch": "node scripts/fetchTranscript.js"
+  },
+  "author": "Sakina Bamba",
+  "license": "MIT",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.3",
+    "puppeteer": "^21.3.8"
+  }
+}
